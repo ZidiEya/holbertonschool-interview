@@ -1,2 +1,2 @@
           GitHub repository: holbertonschool-interview
-             Directory: 0x00-lockboxes
+           Directory: 0x00-lockboxes

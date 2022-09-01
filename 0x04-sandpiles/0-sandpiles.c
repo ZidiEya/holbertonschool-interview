@@ -102,6 +102,6 @@ void sandpiles_sum(int grid1[3][3], int grid2[3][3])
 			break; }
 		printf("=\n");
 		print_grid(new);
-		copy_result(new, sum); /* change sum */
+		copy_result(new, sum); /* change the sum */
 	}
 }

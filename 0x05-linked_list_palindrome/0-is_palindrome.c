@@ -6,7 +6,7 @@
  * Return: 1 if it's palindrome or 0
  */
 
-int is_palindrome(listint_t **head);
+int is_palindrome(listint_t **head)
 {
 	int size_of_list, i;
 	listint_t *current_1;

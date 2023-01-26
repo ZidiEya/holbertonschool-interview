@@ -1,31 +1,52 @@
 #!/usr/bin/python3
-"""script that reads stdin"""
+
+'''
+func that reads stdin line by line and computes metrics
+'''
 import sys
 
+if __name__ == "__main__":
 
-def print_status(size, status):
-    """print a program"""
-    print('File size: {}'.format(size))
-    for key, value in sorted(status.items()):
-        if value:
-            print('{}: {}'.format(key, value))
+    status_codes = {200: 0, 301: 0, 400: 0, 401: 0,
+                    403: 0, 404: 0, 405: 0, 500: 0}
+    file_size = [0]
+    count = 1
 
+    def print_stats():
+        '''
+        func to print file size and stats for every 10 loops
+        '''
+        print('File size: {}'.format(file_size[0]))
 
-if __name__ == '__main__':
-    size, count = 0, 0
-    status = {'200': 0, '301': 0, '400': 0, '401': 0,
-            '403': 0, '404': 0, '405': 0, '500': 0}
+        for code in sorted(status_codes.keys()):
+            if status_codes[code] != 0:
+                print('{}: {}'.format(code, status_codes[code]))
+
+    def parse_stdin(line):
+        '''
+        func that checks the stdin for matches
+        '''
+        try:
+            line = line[:-1]
+            word = line.split(' ')
+            # File size is last param on stdout
+            file_size[0] += int(word[-1])
+            # Status code comes before file size
+            status_code = int(word[-2])
+            # Move through dictionary of status codes
+            if status_code in status_codes:
+                status_codes[status_code] += 1
+        except BaseException:
+            pass
+
     try:
         for line in sys.stdin:
-            args = line.split()
-            if len(args) > 2:
-                if args[-2] in status:
-                    status[args[-2]] += 1
-                size += int(args[-1])
+            parse_stdin(line)
+            # print stats after every 10 outputs
+            if count % 10 == 0:
+                print_stats()
             count += 1
-            if not count % 10:
-                print_status(size, status)
     except KeyboardInterrupt:
-        pass
-    finally:
-        print_status(size, status)
+        print_stats()
+        raise
+    print_stats()

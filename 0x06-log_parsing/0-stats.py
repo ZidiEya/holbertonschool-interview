@@ -1,52 +1,50 @@
 #!/usr/bin/python3
+"""
+script that reads stdin line
+by line and computes metrics:
+"""
+from sys import stdin
 
-'''
-func that reads stdin line by line and computes metrics
-'''
-import sys
+
+state_code = {
+    "200": 0,
+    "301": 0,
+    "400": 0,
+    "401": 0,
+    "403": 0,
+    "404": 0,
+    "405": 0,
+    "500": 0
+}
+
+size = 0
+
+
+def print_list():
+    """Total file size"""
+    print("File size: {}".format(size))
+    for key in sorted(state_code.keys()):
+        if state_code[key]:
+            print("{}: {}".format(key, state_code[key]))
+
 
 if __name__ == "__main__":
-
-    status_codes = {200: 0, 301: 0, 400: 0, 401: 0,
-                    403: 0, 404: 0, 405: 0, 500: 0}
-    file_size = [0]
-    count = 1
-
-    def print_stats():
-        '''
-        func to print file size and stats for every 10 loops
-        '''
-        print('File size: {}'.format(file_size[0]))
-
-        for code in sorted(status_codes.keys()):
-            if status_codes[code] != 0:
-                print('{}: {}'.format(code, status_codes[code]))
-
-    def parse_stdin(line):
-        '''
-        func that checks the stdin for matches
-        '''
-        try:
-            line = line[:-1]
-            word = line.split(' ')
-            # File size is last param on stdout
-            file_size[0] += int(word[-1])
-            # Status code comes before file size
-            status_code = int(word[-2])
-            # Move through dictionary of status codes
-            if status_code in status_codes:
-                status_codes[status_code] += 1
-        except BaseException:
-            pass
-
+    count = 0
     try:
-        for line in sys.stdin:
-            parse_stdin(line)
-            # print stats after every 10 outputs
-            if count % 10 == 0:
-                print_stats()
+        for line in stdin:
+            try:
+                getdata = line.split()
+                size += int(getdata[-1])
+                key_statucode = getdata[-2]
+                if key_statucode in state_code:
+                    state_code[key_statucode] += 1
+            except:
+                pass
+            if count == 9:
+                print_list()
+                count = -1
             count += 1
     except KeyboardInterrupt:
-        print_stats()
+        print_list()
         raise
-    print_stats()
+    print_list()

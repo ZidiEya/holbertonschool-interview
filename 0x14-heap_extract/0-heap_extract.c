@@ -1,122 +1,99 @@
 #include "binary_trees.h"
 
 /**
- * count_nodes - counts the numeber of nodes in a binary tree
- * @root: input tree
- * Return: number of nodes
+ * _height - CHeck the height of a binary tree
+ * @tree: Pointer to the node to measures the height
+ * Return: The height of the tree starting at @node
  */
-unsigned int count_nodes(heap_t *root)
+static size_t _height(const binary_tree_t *tree)
 {
-    if (root == NULL)
-        return (0);
-    return (1 + count_nodes(root->left) + count_nodes(root->right));
+	size_t height_left;
+	size_t height_right;
+
+	height_left = tree->left ? 1 + _height(tree->left) : 0;
+	height_right = tree->right ? 1 + _height(tree->right) : 0;
+	return (height_left > height_right ? height_left : height_right);
 }
 
 /**
- * get_last - finds the last node in a binary heap
- * @root: input tree
- * Return: point to last node
+ * _sorting - binary tree Heapsort
+ * @temp: pointer to the heap root
+ * Return: pointer to last node
  */
-heap_t *get_last(heap_t *root)
+
+heap_t *_sorting(heap_t *temp)
 {
-    unsigned int count, binary = 1;
+	int aux;
 
-    count = count_nodes(root);
-    while (count / binary > 1)
-        binary = binary << 1;
-    binary = binary >> 1;
+	while (temp->left || temp->right)
+	{
+		if (!temp->right || temp->left->n > temp->right->n)
+		{
+			aux = temp->n;
+			temp->n = temp->left->n;
+			temp->left->n = aux;
+			temp = temp->left;
+		}
+		else if (!temp->left || temp->left->n < temp->right->n)
+		{
+			aux = temp->n;
+			temp->n = temp->right->n;
+			temp->right->n = aux;
+			temp = temp->right;
+		}
 
-    while (binary)
-    {
-        if (count & binary)
-            root = root->right;
-        else
-            root = root->left;
-        binary = binary >> 1;
-    }
-    return (root);
+	}
+	return (temp);
 }
 
 /**
- * heapreorder - finds the last node in a binary heap
- * @root: input tree
- * Return: point to last node
+ * _preorder - goes through a binary tree using pre-order traversal
+ * @root: pointer root of the tree
+ * @node: pointer node in the tree
+ * @h: height of tree
+ * @l: layer on the tree
  */
-void heapreorder(heap_t *root)
+void _preorder(heap_t *root, heap_t **node, size_t h, size_t l)
 {
-    heap_t *swap = root;
-    int temp;
-
-    if (root->left && root->right)
-    {
-        if (root->left->n >= root->right->n)
-        {
-            if (root->left->n > root->n)
-                swap = root->left;
-        }
-        else
-        {
-            if (root->right->n > root->n)
-                swap = root->right;
-        }
-    }
-    else if (root->left && root->left->n > root->n)
-        swap = root->left;
-    else if (root->right && root->right->n > root->n)
-        swap = root->right;
-
-    if (swap != root)
-    {
-        temp = root->n;
-        root->n = swap->n;
-        swap->n = temp;
-        heapreorder(swap);
-    }
+	if (!root)
+		return;
+	if (h == l)
+		*node = root;
+	l++;
+	if (root->left)
+		_preorder(root->left, node, h, l);
+	if (root->right)
+		_preorder(root->right, node, h, l);
 }
 
 /**
- * heap_extract - extracts the root node of a max binary heat
- * @root: input tree
- * Return: number extracted, else 0
+ * heap_extract - extracts the root node of a Max Binary Heap
+ * @root: pointer to the heap root
+ * Return: value of extracted node
  */
+
 int heap_extract(heap_t **root)
 {
-    heap_t *lastnode;
-    int extracted;
+	int value;
+	heap_t *aux, *node;
 
-    if (root == NULL || *root == NULL)
-        return (0);
-    lastnode = get_last(*root);
-    extracted = (*root)->n;
-    if (lastnode == *root)
-    {
-        free(*root);
-        *root = NULL;
-    }
-    else
-    {
-        if (lastnode->parent->left == lastnode)
-            lastnode->parent->left = NULL;
-        else
-            lastnode->parent->right = NULL;
-        lastnode->parent = NULL;
-
-        if ((*root)->left == lastnode)
-            lastnode->left = NULL;
-        else
-            lastnode->left = (*root)->left;
-        if ((*root)->right == lastnode)
-            lastnode->right = NULL;
-        else
-            lastnode->right = (*root)->right;
-
-        if (lastnode->left != NULL)
-            lastnode->left->parent = lastnode;
-        if (lastnode->right != NULL)
-            lastnode->right->parent = lastnode;
-        free(*root);
-        *root = lastnode;
-        heapreorder(lastnode);
-    }
-    return (extracted);
+	if (!root || !*root)
+		return (0);
+	aux = *root;
+	value = aux->n;
+	if (!aux->left && !aux->right)
+	{
+		*root = NULL;
+		free(aux);
+		return (value);
+	}
+	_preorder(aux, &node, _height(aux), 0);
+	aux = _sorting(aux);
+	aux->n = node->n;
+	if (node->parent->right)
+		node->parent->right = NULL;
+	else
+		node->parent->left = NULL;
+	free(node);
+	return (value);
 }

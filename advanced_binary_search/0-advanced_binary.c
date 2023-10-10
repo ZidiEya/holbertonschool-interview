@@ -9,7 +9,7 @@
  * Return: index where value is stored, else -1
  */
 int recursive(int *array, int left, int right, int value)
-{
+  {
 	int mid, i;
 
 	if (right >= left)

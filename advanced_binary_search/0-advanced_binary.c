@@ -1,7 +1,7 @@
 #include "search_algos.h"
 
 /**
- * recursive - searches through an array like binary tree
+ * recursive - searches through an array like a binary tree
  * @array: input array
  * @left: left most index
  * @right: right most index
@@ -9,11 +9,12 @@
  * Return: index where value is stored, else -1
  */
 int recursive(int *array, int left, int right, int value)
-  {
+{
 	int mid, i;
 
 	if (right >= left)
-  {
+	{
+		/* print array */
 		printf("Searching in array: ");
 		for (i = left; i <= right; i++)
 			printf("%i%s", array[i], i <= right - 1 ? ", " : "\n");
@@ -29,7 +30,7 @@ int recursive(int *array, int left, int right, int value)
 }
 
 /**
- * advanced_binary - searches through an array like a binary tree
+ * advanced_binary - searches through an array like binary tree
  * @array: input array
  * @size: size of input array
  * @value: value to search

@@ -3,4 +3,4 @@
 
 int *find_substring(const char *s, const char **words, int nb_words, int *n);
 
-#endif
+#endif /* SUBSTRING_H */

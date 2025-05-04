@@ -2,75 +2,79 @@
 #include <string.h>
 #include "substring.h"
 
-/**
- * find_substring - Finds all substrings containing all words from an array
- * @s: input string
- * @words: array of words
- * @nb_words: number of words
- * @n: pointer to store the number of indices found
- * Return: array of starting indices, or NULL
- */
+/* Helper function to get index of a word in list, -1 if not found */
+int get_word_index(const char *word, const char **words, int nb_words)
+{
+    int i;
+    for (i = 0; i < nb_words; i++)
+    {
+        if (strcmp(word, words[i]) == 0)
+            return i;
+    }
+    return -1;
+}
+
 int *find_substring(const char *s, const char **words, int nb_words, int *n)
 {
-    int i, j, k, word_len, substr_len, str_len, index_count = 0;
-    int *indices = NULL;
-    char *curr;
-    int *word_count, *seen;
+    int *result = NULL;
+    int result_size = 0;
+    int s_len = strlen(s);
+    int word_len = strlen(words[0]);
+    int total_len = word_len * nb_words;
+    int i, j, k;
 
-    if (!s || !words || nb_words == 0 || !n)
-        return (NULL);
+    if (!s || !words || nb_words == 0 || !n || s_len < total_len)
+        return NULL;
 
-    word_len = strlen(words[0]);
-    substr_len = word_len * nb_words;
-    str_len = strlen(s);
-
-    if (str_len < substr_len)
-        return (NULL);
-
-    // Allocate memory for result
-    indices = malloc(sizeof(int) * (str_len - substr_len + 1));
-    if (!indices)
-        return (NULL);
-
-    // Count frequency of each word in input
-    word_count = calloc(nb_words, sizeof(int));
+    /* Build word count */
+    int *word_freq = calloc(nb_words, sizeof(int));
     for (i = 0; i < nb_words; i++)
-        for (j = 0; j < nb_words; j++)
-            if (strcmp(words[i], words[j]) == 0)
-                word_count[i]++;
-
-    // Scan the string
-    for (i = 0; i <= str_len - substr_len; i++)
     {
-        seen = calloc(nb_words, sizeof(int));
+        for (j = i + 1; j < nb_words; j++)
+        {
+            if (strcmp(words[i], words[j]) == 0)
+                break;
+        }
+        word_freq[i]++;
+    }
+
+    for (i = 0; i <= s_len - total_len; i++)
+    {
+        int *seen = calloc(nb_words, sizeof(int));
         for (j = 0; j < nb_words; j++)
         {
-            curr = strndup(s + i + j * word_len, word_len);
-            for (k = 0; k < nb_words; k++)
+            int start = i + j * word_len;
+            char *substr = strndup(s + start, word_len);
+            int idx = get_word_index(substr, words, nb_words);
+            free(substr);
+
+            if (idx == -1)
             {
-                if (strcmp(curr, words[k]) == 0)
-                {
-                    seen[k]++;
-                    break;
-                }
+                free(seen);
+                break;
             }
-            free(curr);
-            if (k == nb_words || seen[k] > word_count[k])
+            seen[idx]++;
+            if (seen[idx] > word_freq[idx])
             {
+                free(seen);
                 break;
             }
         }
         if (j == nb_words)
-            indices[index_count++] = i;
-        free(seen);
+        {
+            result = realloc(result, sizeof(int) * (result_size + 1));
+            result[result_size++] = i;
+        }
+        if (seen)
+            free(seen);
     }
 
-    *n = index_count;
-    if (index_count == 0)
+    *n = result_size;
+    if (result_size == 0)
     {
-        free(indices);
+        free(result);
         return NULL;
     }
 
-    return indices;
+    return result;
 }

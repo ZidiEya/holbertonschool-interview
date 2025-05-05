@@ -1,31 +1,34 @@
 #!/usr/bin/python3
-"""Solves the N Queens problem."""
+"""
+Solves the N Queens puzzle using backtracking
+"""
+
 import sys
 
 
-def is_safe(row, col, solution):
-    """Check if placing a queen at (row, col) is safe from attack."""
-    for r in range(row):
-        c = solution[r]
+def is_safe(row, col, queens):
+    """Check if a queen can be placed at (row, col)"""
+    for r, c in enumerate(queens):
         if c == col or abs(c - col) == abs(r - row):
             return False
     return True
 
 
-def solve_nqueens(n, row=0, solution=[]):
-    """Recursively solve the N Queens problem."""
+def solve(row, n, queens):
+    """Recursively solve N Queens"""
     if row == n:
-        print([[r, solution[r]] for r in range(n)])
+        print([[r, c] for r, c in enumerate(queens)])
         return
+
     for col in range(n):
-        if is_safe(row, col, solution):
-            solution.append(col)
-            solve_nqueens(n, row + 1, solution)
-            solution.pop()
+        if is_safe(row, col, queens):
+            queens.append(col)
+            solve(row + 1, n, queens)
+            queens.pop()
 
 
 def main():
-    """Main entry point for the program."""
+    """Parse command line and start solving"""
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
         sys.exit(1)
@@ -40,7 +43,7 @@ def main():
         print("N must be at least 4")
         sys.exit(1)
 
-    solve_nqueens(n)
+    solve(0, n, [])
 
 
 if __name__ == "__main__":

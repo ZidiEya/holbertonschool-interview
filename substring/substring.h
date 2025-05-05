@@ -1,6 +1,9 @@
 #ifndef SUBSTRING_H
 #define SUBSTRING_H
 
-int *find_substring(const char *s, const char **words, int nb_words, int *n);
+#include <stddef.h>
+
+/* Extracts a substring from a string */
+char *substring(const char *str, int start, int len);
 
 #endif /* SUBSTRING_H */

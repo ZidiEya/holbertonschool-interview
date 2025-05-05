@@ -24,3 +24,11 @@ Backtrack if necessary: If placing a queen leads to a conflict later, remove the
 
 Repeat until all rows are filled: Once all rows have queens placed safely, record the solution.
 
+
+
+
+
+holbertonschool-interview/
+└── nqueens/
+    ├── 0-nqueens.py
+    ├── README.md

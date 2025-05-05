@@ -1,114 +1,79 @@
+#include "substring.h"
 #include <stdlib.h>
 #include <string.h>
-#include "substring.h"
 
 /**
- * struct word_node - a word entry for counting
- * @word: the word itself
- * @count: how many times it appears
+ * is_match - checks if a substring matches all words in any order
+ * @s: the starting point in the string
+ * @words: array of words to match
+ * @nb_words: number of words
+ * @word_len: length of each word
+ * Return: 1 if all words match, 0 otherwise
  */
-typedef struct word_node
+int is_match(const char *s, const char **words, int nb_words, int word_len)
 {
-    const char *word;
-    int count;
-} word_node;
+    int *seen = calloc(nb_words, sizeof(int));
+    if (!seen)
+        return 0;
 
-/**
- * match_words - compare expected and actual word counts
- * Return: 1 if equal, 0 otherwise
- */
-int match_words(word_node *expected, word_node *actual, int nb_words)
-{
     for (int i = 0; i < nb_words; i++)
     {
-        if (actual[i].count != expected[i].count)
+        int found = 0;
+        for (int j = 0; j < nb_words; j++)
+        {
+            if (!seen[j] && strncmp(s + i * word_len, words[j], word_len) == 0)
+            {
+                seen[j] = 1;
+                found = 1;
+                break;
+            }
+        }
+        if (!found)
+        {
+            free(seen);
             return 0;
+        }
     }
+
+    free(seen);
     return 1;
 }
 
 /**
- * find_substring - finds all starting indices of substrings in `s` that
- * are a concatenation of each word in `words` exactly once.
+ * find_substring - finds all substrings made of concatenated words
+ * @s: input string
+ * @words: list of words
+ * @nb_words: number of words
+ * @n: pointer to result count
+ * Return: array of starting indices
  */
 int *find_substring(const char *s, const char **words, int nb_words, int *n)
 {
-    int *indices = NULL;
-    int str_len = strlen(s);
-    int word_len, total_len;
-    int i, j;
+    int word_len, total_len, str_len, *indices = NULL, count = 0;
 
-    *n = 0;
-
-    if (!s || !words || nb_words == 0)
+    if (!s || !words || nb_words == 0 || !n)
         return NULL;
 
     word_len = strlen(words[0]);
     total_len = word_len * nb_words;
+    str_len = strlen(s);
 
-    if (str_len < total_len)
+    indices = malloc(sizeof(int) * (str_len));
+    if (!indices)
         return NULL;
 
-    // Create the expected word count
-    word_node *expected = malloc(sizeof(word_node) * nb_words);
-    for (i = 0; i < nb_words; i++)
+    for (int i = 0; i <= str_len - total_len; i++)
     {
-        expected[i].word = words[i];
-        expected[i].count = 0;
-        for (j = 0; j < i; j++)
-        {
-            if (strcmp(words[i], expected[j].word) == 0)
-            {
-                expected[j].count++;
-                break;
-            }
-        }
-        if (j == i)
-            expected[i].count = 1;
+        if (is_match(s + i, words, nb_words, word_len))
+            indices[count++] = i;
     }
 
-    // Main loop to check each possible starting point
-    for (i = 0; i <= str_len - total_len; i++)
+    if (count == 0)
     {
-        word_node *actual = malloc(sizeof(word_node) * nb_words);
-        for (j = 0; j < nb_words; j++)
-        {
-            actual[j].word = words[j];
-            actual[j].count = 0;
-        }
-
-        int matched = 1;
-        for (j = 0; j < nb_words; j++)
-        {
-            const char *sub = s + i + j * word_len;
-            int found = 0;
-
-            for (int k = 0; k < nb_words; k++)
-            {
-                if (strncmp(sub, words[k], word_len) == 0)
-                {
-                    actual[k].count++;
-                    if (actual[k].count > expected[k].count)
-                        matched = 0;
-                    found = 1;
-                    break;
-                }
-            }
-
-            if (!found || !matched)
-                break;
-        }
-
-        if (matched && match_words(expected, actual, nb_words))
-        {
-            indices = realloc(indices, sizeof(int) * (*n + 1));
-            indices[*n] = i;
-            (*n)++;
-        }
-
-        free(actual);
+        free(indices);
+        indices = NULL;
     }
 
-    free(expected);
+    *n = count;
     return indices;
 }

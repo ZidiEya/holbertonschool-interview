@@ -1,18 +1,17 @@
 #!/usr/bin/node
 
 const request = require('request');
-const movieId = process.argv[2];
 
+const movieId = process.argv[2];
 if (!movieId) {
-  process.exit();
+  console.error('Usage: ./0-starwars_characters.js <movie_id>');
+  process.exit(1);
 }
 
-const apiUrl = `https://swapi-api.alx-tools.com/api/films/${movieId}/`;
+const url = `https://swapi-api.alx-tools.com/api/films/${movieId}/`;
 
-request(apiUrl, function (err, response, body) {
-  if (err || response.statusCode !== 200) {
-    return;
-  }
+request(url, (error, response, body) => {
+  if (error) return;
 
   const film = JSON.parse(body);
   const characters = film.characters;
@@ -23,8 +22,8 @@ request(apiUrl, function (err, response, body) {
 function printCharacters (characters, index) {
   if (index >= characters.length) return;
 
-  request(characters[index], function (err, response, body) {
-    if (!err && response.statusCode === 200) {
+  request(characters[index], (error, response, body) => {
+    if (!error) {
       const character = JSON.parse(body);
       console.log(character.name);
       printCharacters(characters, index + 1);

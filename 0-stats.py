@@ -3,7 +3,6 @@ import sys
 import signal
 
 # Metrics
-total_size = 0
 status_codes = {}
 valid_codes = ['200', '301', '400', '401', '403', '404', '405', '500']
 line_count = 0

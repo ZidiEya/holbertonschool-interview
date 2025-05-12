@@ -2,6 +2,10 @@
 import sys
 
 def print_stats(total_size, status_codes):
+    """
+    This function prints the total file size and the count of each status code.
+    It only prints status codes that have appeared in the logs.
+    """
     print(f"File size: {total_size}")
     for code in sorted(status_codes):
         if status_codes[code] > 0:
@@ -35,9 +39,9 @@ def main():
             # Print stats every 10 lines or on interrupt
             if line_count % 10 == 0:
                 print_stats(total_size, status_codes)
-                
+
     except KeyboardInterrupt:
-        # Handle keyboard interruption
+        # Handle keyboard interruption (CTRL+C)
         print_stats(total_size, status_codes)
         sys.exit(0)
 

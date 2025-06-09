@@ -21,3 +21,18 @@ possible status code: 200, 301, 400, 401, 403, 404, 405 and 500
 if a status code doesn’t appear or is not an integer, don’t print anything for this status code
 format: <status code>: <number>
 status codes should be printed in ascending order
+
+✅ Features
+Follows PEP 8 (1.7.x).
+
+Handles input line-by-line.
+
+Handles keyboard interruption (CTRL + C).
+
+Prints metrics every 10 lines and on keyboard interrupt.
+
+Skips malformed lines.
+
+Maintains correct format for status codes and file size.
+
+

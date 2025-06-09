@@ -1,49 +1,44 @@
 #!/usr/bin/python3
 import sys
+import signal
 
-def print_stats(total_size, status_codes):
-    """
-    This function prints the total file size and the count of each status code.
-    It only prints status codes that have appeared in the logs.
-    """
-    print(f"File size: {total_size}")
-    for code in sorted(status_codes):
-        if status_codes[code] > 0:
-            print(f"{code}: {status_codes[code]}")
+# Initialize metrics
+total_size = 0
+status_codes = {}
+valid_codes = ['200', '301', '400', '401', '403', '404', '405', '500']
+line_count = 0
 
-def main():
-    total_size = 0
-    status_codes = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
-    line_count = 0
+def print_stats():
+    """Print accumulated statistics"""
+    print("File size: {}".format(total_size))
+    for code in sorted(status_codes.keys()):
+        print("{}: {}".format(code, status_codes[code]))
 
-    try:
-        for line in sys.stdin:
-            # Parse the line to extract the relevant information
-            parts = line.split()
-            if len(parts) != 9:
-                continue  # Skip lines that don't match the format
+try:
+    for line in sys.stdin:
+        line_count += 1
+        parts = line.split()
 
-            # Extract file size and status code
-            try:
-                status_code = int(parts[8])
-                file_size = int(parts[7])
-            except ValueError:
-                continue  # Skip lines where status_code or file_size isn't an integer
+        if len(parts) < 9:
+            continue
 
-            # Only count the allowed status codes
-            if status_code in status_codes:
-                total_size += file_size
-                status_codes[status_code] += 1
-                line_count += 1
+        # Extract status code and file size
+        code = parts[-2]
+        size = parts[-1]
 
-            # Print stats every 10 lines or on interrupt
-            if line_count % 10 == 0:
-                print_stats(total_size, status_codes)
+        try:
+            total_size += int(size)
+        except ValueError:
+            continue
 
-    except KeyboardInterrupt:
-        # Handle keyboard interruption (CTRL+C)
-        print_stats(total_size, status_codes)
-        sys.exit(0)
+        if code in valid_codes:
+            status_codes[code] = status_codes.get(code, 0) + 1
 
-if __name__ == "__main__":
-    main()
+        if line_count % 10 == 0:
+            print_stats()
+
+except KeyboardInterrupt:
+    print_stats()
+    raise
+
+print_stats()

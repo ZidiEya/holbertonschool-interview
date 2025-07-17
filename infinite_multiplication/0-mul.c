@@ -3,7 +3,8 @@
 
 /**
  * is_digit - checks if a string contains only digits
- * @s: input string
+ * @s: the string to check
+ *
  * Return: 1 if only digits, 0 otherwise
  */
 int is_digit(char *s)
@@ -21,8 +22,9 @@ int is_digit(char *s)
 
 /**
  * _strlen - returns the length of a string
- * @s: string
- * Return: length
+ * @s: the string
+ *
+ * Return: length of string
  */
 int _strlen(char *s)
 {
@@ -34,16 +36,16 @@ int _strlen(char *s)
 }
 
 /**
- * print_error - prints "Error" and exits with code 98
+ * print_error - prints "Error" and exits with status 98
  */
 void print_error(void)
 {
-	char *err = "Error\n";
+	char *msg = "Error\n";
 	int i = 0;
 
-	while (err[i])
+	while (msg[i])
 	{
-		_putchar(err[i]);
+		_putchar(msg[i]);
 		i++;
 	}
 	exit(98);
@@ -53,12 +55,14 @@ void print_error(void)
  * main - multiplies two positive numbers
  * @argc: argument count
  * @argv: argument vector
+ *
  * Return: 0 on success
  */
 int main(int argc, char *argv[])
 {
 	char *num1, *num2;
-	int len1, len2, i, j, *result, n1, n2, carry, sum;
+	int len1, len2, i, j, *result;
+	int n1, n2, carry, sum, start;
 
 	if (argc != 3)
 		print_error();
@@ -71,7 +75,7 @@ int main(int argc, char *argv[])
 	len1 = _strlen(num1);
 	len2 = _strlen(num2);
 	result = malloc(sizeof(int) * (len1 + len2));
-	if (!result)
+	if (result == NULL)
 		exit(98);
 
 	for (i = 0; i < len1 + len2; i++)
@@ -84,24 +88,25 @@ int main(int argc, char *argv[])
 		for (j = len2 - 1; j >= 0; j--)
 		{
 			n2 = num2[j] - '0';
-			sum = result[i + j + 1] + (n1 * n2) + carry;
+			sum = n1 * n2 + result[i + j + 1] + carry;
 			result[i + j + 1] = sum % 10;
 			carry = sum / 10;
 		}
 		result[i + j + 1] += carry;
 	}
 
-	i = 0;
-	while (i < len1 + len2 && result[i] == 0)
-		i++;
-	if (i == len1 + len2)
+	start = 0;
+	while (start < len1 + len2 && result[start] == 0)
+		start++;
+	if (start == len1 + len2)
 		_putchar('0');
 	else
 	{
-		for (; i < len1 + len2; i++)
+		for (i = start; i < len1 + len2; i++)
 			_putchar(result[i] + '0');
 	}
 	_putchar('\n');
 	free(result);
 	return (0);
 }
+

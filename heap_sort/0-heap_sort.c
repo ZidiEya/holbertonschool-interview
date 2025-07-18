@@ -5,7 +5,7 @@
  * using Heap Sort algorithm
  *
  * @array: the array of ints to sort
- * @size: the size of the array to sort
+ * @size: the size of array to sort
  *
  */
 void heap_sort(int *array, size_t size)
@@ -16,7 +16,7 @@ void heap_sort(int *array, size_t size)
 }
 
 /**
- * heap_sort_print - heap sort with full array as parameter for printing
+ * heap_sort_print - heap sort with the full array as parameter for printing
  *
  * @array: array to sort
  * @size: size of array to sort

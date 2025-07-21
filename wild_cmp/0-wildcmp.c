@@ -1,11 +1,11 @@
 #include "holberton.h"
 
 /**
- * wildcmp - compares two strings with wildcard support
+ * wildcmp - compares two strings, allowing wildcard '*'
  * @s1: the first string
- * @s2: the second string (may contain the wildcard '*')
+ * @s2: the second string, may contain '*'
  *
- * Return: 1 if the strings can be considered identical, 0 otherwise
+ * Return: 1 if strings match, otherwise 0
  */
 int wildcmp(char *s1, char *s2)
 {
@@ -14,22 +14,16 @@ int wildcmp(char *s1, char *s2)
 
 	if (*s2 == '*')
 	{
-		/* Skip multiple '*' */
 		while (*s2 == '*')
 			s2++;
-
-		/* If wildcard is last, it's a match */
 		if (*s2 == '\0')
 			return (1);
-
-		/* Recursively compare substrings */
-		while (*s1)
+		while (*s1 != '\0')
 		{
 			if (wildcmp(s1, s2))
 				return (1);
 			s1++;
 		}
-
 		return (0);
 	}
 

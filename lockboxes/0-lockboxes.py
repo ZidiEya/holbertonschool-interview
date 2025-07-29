@@ -1,8 +1,14 @@
 #!/usr/bin/python3
+"""
+Module 0-lockboxes
+Determines if all boxes can be opened.
+"""
+
+
 def canUnlockAll(boxes):
     """
     Determines if all the boxes can be opened.
-    
+
     Args:
         boxes (list of list of int): A list where each index represents a box,
                                      and each box contains a list of keys.
@@ -14,11 +20,6 @@ def canUnlockAll(boxes):
         return False
 
     n = len(boxes)
-    if n == 0:
-        return False
-    if n == 1:
-        return True
-
     opened = set([0])
     keys = set(boxes[0])
 

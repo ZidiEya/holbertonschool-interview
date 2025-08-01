@@ -1,114 +1,57 @@
 #!/usr/bin/python3
-
-"""
-Solves the N Queens puzzle for NxN chessboard
-finds placement of N number of non-attacking queens
-"""
-
+"""N-queen task"""
 import sys
 
 
-def board_set_up(N):
-    """
-    Sets up blank NxN chessboard
-
-    parameters:
-        N [int]: represents the size of the board
-
-    board is initialized to 0s
-    """
-    matrix = []
-    for row in range(N):
-        matrix_row = []
-        for column in range(N):
-            matrix_row.append(0)
-        matrix.append(matrix_row)
-    return (matrix)
-
-
-def print_solution(matrix):
-    """
-    Prints the coordinates where there is a queen
-
-    parameters:
-        matrix [list of lists]: represents the NxN chessboard
-
-    queens indicated by 1 in matrix
-    coordinates printed as list of lists
-    """
-    queens_coordinates = []
-    for i, row in enumerate(matrix):
-        for j, column in enumerate(row):
-            if column == 1:
-                queen = []
-                queen.append(i)
-                queen.append(j)
-                queens_coordinates.append(queen)
-    print(queens_coordinates)
-
-
-def is_safe(matrix, new_row, new_column):
-    """
-    Determines if a queen is safe to be put in new_row, new_column
-
-    parameters:
-        matrix [list of lists]: represents the NxN chessboard
-        new_row [int]: row coordinate for potential new queen
-        new_column [int]: column coordinate for potential new queen
-    """
-    # checks row up to column (left side of row)
-    for i in range(new_column):
-        if matrix[new_row][i]:
+def is_safe(board, row, col):
+    """Check if it's safe to place a queen at board[row][col]."""
+    for i in range(col):
+        if board[row][i] == 1:
             return False
-    # checks upper diagonal
-    for i, j in zip(range(new_row, -1, -1),
-                    range(new_column, -1, -1)):
-        if matrix[i][j]:
+    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):
+        if board[i][j] == 1:
             return False
-    N = len(matrix)
-    # checks lower diagonal
-    for i, j in zip(range(new_row, N, 1),
-                    range(new_column, -1, -1)):
-        if matrix[i][j]:
+    for i, j in zip(range(row, len(board), 1), range(col, -1, -1)):
+        if board[i][j] == 1:
             return False
     return True
 
 
-def solve(matrix, new_column):
-    """
-    Recursively solves the N Queens puzzle
+def solve_nqueens(board, col):
+    """Use backtracking to find all solutions."""
+    if col >= len(board):
+        print_solution(board)
+        return True
+    res = False
+    for i in range(len(board)):
+        if is_safe(board, i, col):
+            board[i][col] = 1
+            res = solve_nqueens(board, col + 1) or res
+            board[i][col] = 0
+    return res
 
-    parameters:
-        matrix [list of lists]: represents NxN chessboard
-        new_column [int]: column to test for new queen
-    """
-    N = len(matrix)
-    # base case: all queens are placed
-    if new_column >= N:
-        print_solution(matrix)
-        return matrix
-    for new_row in range(N):
-        if is_safe(matrix, new_row, new_column):
-            matrix[new_row][new_column] = 1
-            # call to recursively try to solve rest of queens
-            solve(matrix, new_column + 1)
-            # if can't solve with this position, re-set as 0
-            matrix[new_row][new_column] = 0
-    return None
+
+def print_solution(board):
+    """Print the board configuration."""
+    solution = []
+    for i in range(len(board)):
+        for j in range(len(board)):
+            if board[i][j] == 1:
+                solution.append([i, j])
+    print(solution)
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: nqueens N")
-        exit(1)
-    N = sys.argv[1]
+        sys.exit(1)
     try:
-        N = int(N)
-    except Exception as e:
+        N = int(sys.argv[1])
+    except ValueError:
         print("N must be a number")
-        exit(1)
+        sys.exit(1)
     if N < 4:
         print("N must be at least 4")
-        exit(1)
-    matrix = board_set_up(N)
-    solve(matrix, 0)
+        sys.exit(1)
+    board = [[0 for _ in range(N)] for _ in range(N)]
+    solve_nqueens(board, 0)

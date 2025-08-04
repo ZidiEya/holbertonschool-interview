@@ -1,46 +1,46 @@
 #!/usr/bin/python3
-
+"""
+Script that reads stdin line by line and computes metrics.
+"""
 
 import sys
-import signal
 
-# Initialize metrics
-total_size = 0
-status_codes = {}
-valid_codes = ['200', '301', '400', '401', '403', '404', '405', '500']
-line_count = 0
-
-def print_stats():
-    """Print accumulated statistics"""
+def print_stats(total_size, status_counts):
+    """Prints accumulated statistics."""
     print("File size: {}".format(total_size))
-    for code in sorted(status_codes.keys()):
-        print("{}: {}".format(code, status_codes[code]))
+    for code in sorted(status_counts.keys()):
+        print("{}: {}".format(code, status_counts[code]))
+
+status_codes = ['200', '301', '400', '401', '403', '404', '405', '500']
+status_counts = {}
+total_size = 0
+line_count = 0
 
 try:
     for line in sys.stdin:
-        line_count += 1
         parts = line.split()
+        if len(parts) >= 7:
+            status_code = parts[-2]
+            file_size = parts[-1]
 
-        if len(parts) < 9:
-            continue
+            # Validate and accumulate file size
+            try:
+                total_size += int(file_size)
+            except Exception:
+                continue
 
-        # Extract status code and file size
-        code = parts[-2]
-        size = parts[-1]
+            # Validate and count status code
+            if status_code in status_codes:
+                if status_code not in status_counts:
+                    status_counts[status_code] = 0
+                status_counts[status_code] += 1
 
-        try:
-            total_size += int(size)
-        except ValueError:
-            continue
+            line_count += 1
 
-        if code in valid_codes:
-            status_codes[code] = status_codes.get(code, 0) + 1
-
-        if line_count % 10 == 0:
-            print_stats()
+            if line_count % 10 == 0:
+                print_stats(total_size, status_counts)
 
 except KeyboardInterrupt:
-    print_stats()
-    raise
-
-print_stats()
+    pass
+finally:
+    print_stats(total_size, status_counts)

@@ -1,70 +1,36 @@
 #!/usr/bin/node
+// Prints all characters of a given Star Wars movie ID
 
 const request = require('request');
-
-// Get movie ID from command line arguments
 const movieId = process.argv[2];
+const apiUrl = `https://swapi-api.hbtn.io/api/films/${movieId}/`;
 
-// Check if movie ID is provided
 if (!movieId) {
   console.error('Usage: ./0-starwars_characters.js <movie_id>');
   process.exit(1);
 }
 
-// Star Wars API base URL
-const apiUrl = `https://swapi-api.alx-tools.com/api/films/${movieId}/`;
+request(apiUrl, function (err, response, body) {
+  if (err) {
+    console.error(err);
+    return;
+  }
 
-// Func to fetch character name from URL
-function getCharacterName(characterUrl) {
-  return new Promise((resolve, reject) => {
-    request(characterUrl, (error, response, body) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      
-      if (response.statusCode !== 200) {
-        reject(new Error(`Failed to fetch character: ${response.statusCode}`));
-        return;
-      }
-      
-      try {
-        const character = JSON.parse(body);
-        resolve(character.name);
-      } catch (parseError) {
-        reject(parseError);
+  const characters = JSON.parse(body).characters;
+
+  const fetchCharacter = (index) => {
+    if (index >= characters.length) return;
+
+    request(characters[index], function (err2, res2, body2) {
+      if (!err2) {
+        const character = JSON.parse(body2);
+        console.log(character.name);
+        fetchCharacter(index + 1);
+      } else {
+        console.error(err2);
       }
     });
-  });
-}
+  };
 
-// Fetch the movie data
-request(apiUrl, async (error, response, body) => {
-  if (error) {
-    console.error('Error fetching movie data:', error.message);
-    process.exit(1);
-  }
-  
-  if (response.statusCode !== 200) {
-    console.error(`Error: Movie with ID ${movieId} not found`);
-    process.exit(1);
-  }
-  
-  try {
-    const movie = JSON.parse(body);
-    const characterUrls = movie.characters;
-    
-    // Fetch all character names in order
-    for (const characterUrl of characterUrls) {
-      try {
-        const characterName = await getCharacterName(characterUrl);
-        console.log(characterName);
-      } catch (charError) {
-        console.error('Error fetching character:', charError.message);
-      }
-    }
-  } catch (parseError) {
-    console.error('Error parsing movie data:', parseError.message);
-    process.exit(1);
-  }
+  fetchCharacter(0);
 });

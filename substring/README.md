@@ -1,56 +1,27 @@
-The substring directory in the Holberton School Interview repository contains a project titled "Substring with concatenated words". This task involves identifying all starting indices in a string s where a substring is a concatenation of each word from a list of words exactly once, without any intervening characters.
-GitHub
+Parcourir la chaîne s caractère par caractère.
 
-Problem Overview
-Given:
+Vérifier à chaque position si on peut trouver une concaténation de tous les mots (words), dans n’importe quel ordre, sans caractère entre eux.
 
-A string s
+Retourner un tableau dynamique contenant toutes les positions où c’est vrai.
 
-A list of words of the same length
+Mettre dans *n le nombre de résultats trouvés.
 
-The goal is to find all starting indices in s where a substring is a concatenation of each word in the list exactly once, with no intervening characters.
+Étapes de la logique
+Longueurs
 
-Example
-For s = "barfoothefoobarman" and words = ["foo", "bar"], the function should return [0, 9], since:
+Tous les mots ont la même longueur → word_len = strlen(words[0])
 
-At index 0: "barfoo" is a concatenation of "bar" and "foo"
+Longueur totale d’une combinaison = word_len * nb_words
 
-At index 9: "foobar" is a concatenation of "foo" and "bar"
-Glassdoor
-+1
-hackerrank.com
-+1
+À chaque index i dans s
 
-Constraints
-The length of s will be at least 1.
+Prendre un tableau temporaire used[] pour savoir quels mots ont déjà été utilisés.
 
-The length of each word in words will be greater than 0.
+Extraire des segments de longueur word_len et vérifier s’ils correspondent à un mot qui n’a pas encore été pris.
 
-The number of words in words will be at least 1.
+Si on réussit à prendre nb_words mots consécutifs, i est un index valide.
 
-Approach
-To solve this problem efficiently, consider the following approach:
+Stockage
 
-Word Length Calculation: Determine the length of each word in words (assuming all words have the same length).
-
-Sliding Window: Use a sliding window of size equal to the total length of all words combined.
-GitHub
-+3
-Glassdoor
-+3
-hackerrank.com
-+3
-
-Word Counting: Maintain a count of each word in words using a hash map.
-
-Window Validation: For each position in s, check if the substring starting at that position contains a valid concatenation of all words.
-
-Result Collection: If a valid concatenation is found, record the starting index.
-
-Time Complexity
-The time complexity of this approach is O(n * m), where:
-
-n is the length of the string s
-
-m is the length of each word in words
+On utilise malloc pour stocker les indices trouvés, on agrandit avec realloc si besoin.
 

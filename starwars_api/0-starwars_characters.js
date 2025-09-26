@@ -1,30 +1,41 @@
 #!/usr/bin/node
+// Script to print all characters of a Star Wars movie
+// Usage: ./0-starwars_characters.js <movie_id>
 
 const request = require('request');
 
-const asyncGetChar = async function (url) {
-  return new Promise(function (resolve, reject) {
-    request(url, function (err, res, body) {
-      if (!err && res.statusCode === 200) {
-        resolve(body);
-      } else {
-        reject(err);
+if (process.argv.length !== 3) {
+  console.error('Usage: ./0-starwars_characters.js <movie_id>');
+  process.exit(1);
+}
+
+const movieId = process.argv[2];
+const url = `https://swapi.dev/api/films/${movieId}/`;
+
+request(url, { json: true }, (err, res, body) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  if (res.statusCode !== 200) {
+    console.error(`Error: Status code ${res.statusCode}`);
+    return;
+  }
+
+  const characters = body.characters;
+
+  // Function to fetch each character recursively to preserve order
+  const fetchCharacter = (index) => {
+    if (index >= characters.length) return;
+
+    request(characters[index], { json: true }, (err2, res2, charBody) => {
+      if (!err2 && res2.statusCode === 200) {
+        console.log(charBody.name);
+        fetchCharacter(index + 1);
       }
     });
-  });
-};
+  };
 
-request('https://swapi-api.hbtn.io/api/films/' + process.argv[2],
-  function (err, res, body) {
-    if (err) { console.log(err); }
-    const jsn = JSON.parse(body);
-    const chars = jsn.characters;
-    (async function () {
-      for (let i = 0; i < chars.length; i++) {
-        const res = await asyncGetChar(chars[i]);
-        const name = JSON.parse(res);
-        console.log(name.name);
-      }
-    })();
-  }
-);
+  fetchCharacter(0);
+});
